@@ -7,19 +7,28 @@
 //
 
 #import "GPBannerView.h"
-#import "GPCollectionView.h"
 #import "GPBannerLayout.h"
 #import "GPBannerCell.h"
 #import "Masonry.h"
+
+#define DRAG_DISPLACEMENT_THRESHOLD 50
 
 static NSString *cellIdentifier = @"BannerViewIdentifier";
 
 @interface GPBannerView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
-@property (nonatomic, strong) GPCollectionView *collectionView; /**< CollectionView */
+@property (nonatomic, strong) UICollectionView *collectionView; /**< CollectionView */
 @property (nonatomic, strong) GPBannerLayout *bannerLayout;  /**< 自定义布局 */
 @property (nonatomic, assign) NSInteger totalImageCount; /**< Item 个数 */
 @property (nonatomic, weak) NSTimer *timer; /**< 定时器 */
+@property (nonatomic, copy) NSString *cellIdentifier; /**< Cell Identifier */
+@property (nonatomic, assign) CGFloat pageWidth; /**< CollectionView PageWidth */
+@property (nonatomic, assign) CGFloat pageHeight; /**< CollectionView PageHeight */
+@property (nonatomic, assign) BOOL snapping;
+@property (nonatomic, assign) CGPoint dragVelocity;
+@property (nonatomic, assign) CGPoint dragDisplacement;
+@property (nonatomic, assign) BOOL pageEnable;
+
 
 @end
 
@@ -41,6 +50,7 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
         
         self.backgroundColor = [UIColor purpleColor];
         self.time = 2;
+        self.pageEnable = YES;
         [self setupUI];
         [self setupConstraints];
     }
@@ -52,7 +62,7 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
     [super layoutSubviews];
     
     // 在一开始的时候设置 CollectionView 的偏移位置
-    self.collectionView.contentOffset = CGPointMake(self.collectionView.pageWidth * self.totalImageCount * 0.5, 0);
+    self.collectionView.contentOffset = CGPointMake(self.pageWidth * self.totalImageCount * 0.5, 0);
     [self timerStart];
 }
 
@@ -130,7 +140,7 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
  */
 - (int)currentIndex {
     
-    int index = self.collectionView.contentOffset.x / self.collectionView.pageWidth;
+    int index = self.collectionView.contentOffset.x / self.pageWidth;
     return MAX(0, index);
 }
 
@@ -154,12 +164,12 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
 {
     if (targetIndex >= self.totalImageCount - self.dataSource.count) {
         targetIndex = self.totalImageCount * 0.5;
-        self.collectionView.contentOffset = CGPointMake(self.collectionView.pageWidth * targetIndex, 0);
+        self.collectionView.contentOffset = CGPointMake(self.pageWidth * targetIndex, 0);
         
         return;
     }
     
-    [self.collectionView setContentOffset:CGPointMake(self.collectionView.pageWidth * targetIndex, 0) animated:YES];
+    [self.collectionView setContentOffset:CGPointMake(self.pageWidth * targetIndex, 0) animated:YES];
 }
 
 /**
@@ -193,6 +203,86 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
     }
 }
 
+- (void)snapToPage {
+    CGPoint pageOffset;
+    
+    pageOffset.x = [self pageOffsetForComponent:YES];
+    pageOffset.y = [self pageOffsetForComponent:NO];
+    
+    
+    CGPoint currentOffset = self.collectionView.contentOffset;
+    
+    if (!CGPointEqualToPoint(pageOffset, currentOffset)) {
+        _snapping = YES;
+        
+        [self.collectionView setContentOffset:pageOffset animated:YES];
+    }
+    
+    _dragVelocity = CGPointZero;
+    _dragDisplacement = CGPointZero;
+}
+
+- (CGFloat)pageOffsetForComponent:(BOOL)isX {
+    if (((isX ? CGRectGetWidth(self.bounds) : CGRectGetHeight(self.bounds)) == 0) || ((isX ? self.collectionView.contentSize.width : self.collectionView.contentSize.height) == 0))
+    return 0;
+    
+    
+    CGFloat pageLength = isX ? _pageWidth : _pageHeight;
+    
+    if (pageLength < FLT_EPSILON)
+    pageLength = isX ? CGRectGetWidth(self.bounds) : CGRectGetHeight(self.bounds);
+    
+    pageLength *= self.collectionView.zoomScale;
+    
+    
+    CGFloat totalLength = isX ? self.collectionView.contentSize.width : self.collectionView.contentSize.height;
+    
+    CGFloat visibleLength = (isX ? CGRectGetWidth(self.bounds) : CGRectGetHeight(self.bounds)) * self.collectionView.zoomScale;
+    
+    CGFloat currentOffset = isX ? self.collectionView.contentOffset.x : self.collectionView.contentOffset.y;
+    
+    CGFloat dragVelocity = isX ? _dragVelocity.x : _dragVelocity.y;
+    
+    CGFloat dragDisplacement = isX ? _dragDisplacement.x : _dragDisplacement.y;
+    
+    
+    CGFloat newOffset;
+    
+    
+    CGFloat index = currentOffset / pageLength;
+    
+    CGFloat lowerIndex = floorf(index);
+    CGFloat upperIndex = ceilf(index);
+    
+    if (ABS(dragDisplacement) < DRAG_DISPLACEMENT_THRESHOLD || dragDisplacement * dragVelocity < 0) {
+        if (index - lowerIndex > upperIndex - index) {
+            index = upperIndex;
+        } else {
+            index = lowerIndex;
+        }
+    } else {
+        if (dragVelocity > 0) {
+            // 向左滑，下一页
+            index = upperIndex;
+        } else {
+            // 向右滑，上一页
+            index = lowerIndex;
+        }
+    }
+    
+    
+    newOffset = pageLength * index;
+    
+    if (newOffset > totalLength - visibleLength)
+    newOffset = totalLength - visibleLength;
+    
+    if (newOffset < 0)
+    newOffset = 0;
+    
+    
+    return newOffset;
+}
+
 
 #pragma mark - UICollectionViewDataSource
 
@@ -213,24 +303,66 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
     return cell;
 }
 
+#pragma mark - UICollectionViewDelegate
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    
+    NSLog(@"点击了第 %d 张图片", [self pageIndexWithCellIndex:[self currentIndex]]);
+}
+
 #pragma mark - UIScrollViewDelegate
 
 /// 开始拖拽,关闭定时器
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     
     [self invalidateTimer];
+    _dragDisplacement = scrollView.contentOffset;
 }
 
 /// 停止拖拽,开启定时器
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     
     [self timerStart];
+    if (!decelerate && self.pageEnable) {
+        
+        [self snapToPage];
+    }
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+    
+    if (self.pageEnable) {
+        *targetContentOffset = scrollView.contentOffset;
+        _dragVelocity = velocity;
+        _dragDisplacement = CGPointMake(scrollView.contentOffset.x - _dragDisplacement.x, scrollView.contentOffset.y - _dragDisplacement.y);
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    
+    if (self.pageEnable)
+    [self snapToPage];
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    
+    if (!_snapping && self.pageEnable) {
+        [self snapToPage];
+    } else {
+        _snapping = NO;
+    }
+}
+
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale {
+    
+    if (self.pageEnable)
+    [self snapToPage];
 }
 
 
 #pragma mark - 懒加载
 
-- (GPCollectionView *)collectionView {
+- (UICollectionView *)collectionView {
     
     if (_collectionView == nil) {
         
@@ -238,12 +370,12 @@ static NSString *cellIdentifier = @"BannerViewIdentifier";
         self.bannerLayout.itemWidth = 126 * (260.0f / 156.0f);
         self.bannerLayout.itemHeight = 126;
         self.bannerLayout.spacing = 30;
+        self.pageWidth = self.bannerLayout.itemWidth + self.bannerLayout.spacing;
         
-        _collectionView = [[GPCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.bannerLayout];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.bannerLayout];
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
-        _collectionView.pageWidth = self.bannerLayout.itemWidth + self.bannerLayout.spacing;
         _collectionView.showsHorizontalScrollIndicator = NO;
         [_collectionView registerClass:[GPBannerCell class] forCellWithReuseIdentifier:cellIdentifier];
     }

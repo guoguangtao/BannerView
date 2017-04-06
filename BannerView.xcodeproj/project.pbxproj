@@ -18,7 +18,6 @@
 		8AC1151A1E6BC5DE00555F98 /* GPBannerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC115101E6BC5DE00555F98 /* GPBannerCell.m */; };
 		8AC1151B1E6BC5DE00555F98 /* GPBannerLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC115121E6BC5DE00555F98 /* GPBannerLayout.m */; };
 		8AC1151C1E6BC5DE00555F98 /* GPBannerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC115141E6BC5DE00555F98 /* GPBannerView.m */; };
-		8AC1151D1E6BC5DE00555F98 /* GPCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC115161E6BC5DE00555F98 /* GPCollectionView.m */; };
 		8AC1155E1E6BE3B300555F98 /* MASCompositeConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC115461E6BE3B300555F98 /* MASCompositeConstraint.m */; };
 		8AC1155F1E6BE3B300555F98 /* MASConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC115491E6BE3B300555F98 /* MASConstraint.m */; };
 		8AC115601E6BE3B300555F98 /* MASConstraintMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1154B1E6BE3B300555F98 /* MASConstraintMaker.m */; };
@@ -71,8 +70,6 @@
 		8AC115121E6BC5DE00555F98 /* GPBannerLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPBannerLayout.m; sourceTree = "<group>"; };
 		8AC115131E6BC5DE00555F98 /* GPBannerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPBannerView.h; sourceTree = "<group>"; };
 		8AC115141E6BC5DE00555F98 /* GPBannerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPBannerView.m; sourceTree = "<group>"; };
-		8AC115151E6BC5DE00555F98 /* GPCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPCollectionView.h; sourceTree = "<group>"; };
-		8AC115161E6BC5DE00555F98 /* GPCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPCollectionView.m; sourceTree = "<group>"; };
 		8AC115451E6BE3B300555F98 /* MASCompositeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASCompositeConstraint.h; sourceTree = "<group>"; };
 		8AC115461E6BE3B300555F98 /* MASCompositeConstraint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASCompositeConstraint.m; sourceTree = "<group>"; };
 		8AC115471E6BE3B300555F98 /* MASConstraint+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASConstraint+Private.h"; sourceTree = "<group>"; };
@@ -198,8 +195,6 @@
 				8AC115121E6BC5DE00555F98 /* GPBannerLayout.m */,
 				8AC115131E6BC5DE00555F98 /* GPBannerView.h */,
 				8AC115141E6BC5DE00555F98 /* GPBannerView.m */,
-				8AC115151E6BC5DE00555F98 /* GPCollectionView.h */,
-				8AC115161E6BC5DE00555F98 /* GPCollectionView.m */,
 			);
 			path = Banner;
 			sourceTree = "<group>";
@@ -371,7 +366,6 @@
 			files = (
 				8AC115641E6BE3B300555F98 /* NSArray+MASAdditions.m in Sources */,
 				8AC115631E6BE3B300555F98 /* MASViewConstraint.m in Sources */,
-				8AC1151D1E6BC5DE00555F98 /* GPCollectionView.m in Sources */,
 				8AC115601E6BE3B300555F98 /* MASConstraintMaker.m in Sources */,
 				8AC115661E6BE3B300555F98 /* View+MASAdditions.m in Sources */,
 				8AC114E31E6BC59400555F98 /* ViewController.m in Sources */,
@@ -617,6 +611,7 @@
 				8AC115071E6BC59500555F98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8AC115081E6BC59500555F98 /* Build configuration list for PBXNativeTarget "BannerViewTests" */ = {
 			isa = XCConfigurationList;
@@ -625,6 +620,7 @@
 				8AC1150A1E6BC59500555F98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8AC1150B1E6BC59500555F98 /* Build configuration list for PBXNativeTarget "BannerViewUITests" */ = {
 			isa = XCConfigurationList;
@@ -633,6 +629,7 @@
 				8AC1150D1E6BC59500555F98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

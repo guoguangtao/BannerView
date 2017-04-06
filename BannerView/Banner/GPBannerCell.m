@@ -38,22 +38,12 @@
     imageView.clipsToBounds = YES;
     [self.contentView addSubview:imageView];
     self.imageView = imageView;
-    
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap)];
-    [imageView addGestureRecognizer:tap];
 }
 
 - (void)setImageName:(NSString *)imageName {
     
     _imageName = imageName;
     self.imageView.image = [UIImage imageNamed:imageName];
-}
-
-- (void)tap {
-    
-    if (self.clickedBlock) {
-        self.clickedBlock();
-    }
 }
 
 @end
