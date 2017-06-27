@@ -46,7 +46,7 @@
     
     [self.bannerView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.left.right.equalTo(self.view);
-        make.height.mas_equalTo(200);
+        make.height.mas_equalTo(220);
     }];
 }
 

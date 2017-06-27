@@ -25,8 +25,6 @@
     self.minimumLineSpacing = self.spacing;
     CGFloat inset = (self.collectionView.bounds.size.width - self.itemWidth) * 0.5;
     self.sectionInset = UIEdgeInsetsMake(0, inset, 0, inset);
-    self.maxWidth = 260;
-    self.maxHeight = 156;
 }
 
 
@@ -40,7 +38,7 @@
 
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
     
-    NSArray *attributesArray = [super layoutAttributesForElementsInRect:rect].copy;
+    NSArray *attributesArray = [super layoutAttributesForElementsInRect:rect];
     // 计算屏幕的中心X位置
     CGFloat centerX = self.collectionView.contentOffset.x + self.collectionView.bounds.size.width * 0.5;
     // 计算可视范围
@@ -62,7 +60,7 @@
         attributes.transform3D = CATransform3DMakeScale(widthScale, heightScale, 1.0f);
     }
     
-    return attributesArray.copy;
+    return attributesArray;
 }
 
 @end
